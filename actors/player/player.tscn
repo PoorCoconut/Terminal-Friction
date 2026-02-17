@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://v8l4x05oj6kr"]
+
+[ext_resource type="Script" uid="uid://bjj8t7170p6mj" path="res://actors/player/player.gd" id="1_nvxhs"]
+[ext_resource type="Texture2D" uid="uid://dhkr3aftu7k5w" path="res://actors/player/TF_testSprites.png" id="2_ilk7j"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ilk7j"]
+atlas = ExtResource("2_ilk7j")
+region = Rect2(0, 16, 32, 16)
+
+[node name="Player" type="CharacterBody2D" unique_id=1682234680]
+script = ExtResource("1_nvxhs")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1063401414]
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1737909452]
+texture = SubResource("AtlasTexture_ilk7j")
+hframes = 2
+metadata/_aseprite_wizard_interface_config_ = {
+"animation_section": false,
+"layer_section": true,
+"output_section": false,
+"pending_changes": {
+"convert_fps_field": 60.0,
+"convert_ms_field": 16.0,
+"convert_to_fps": false,
+"embed_tex": true,
+"i_mode": 0,
+"keep_anim_length": false,
+"layers": [],
+"o_ex_p": "",
+"o_folder": "",
+"o_name": "",
+"only_visible": false,
+"player": "",
+"scale": "1.0",
+"slice": "",
+"source": "res://assets/TF_testSprites.aseprite",
+"source_uid": 7043488814630076440
+},
+"slice_section": false
+}

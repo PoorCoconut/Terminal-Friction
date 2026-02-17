@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://c7l6h44e5tvw7"
+path="res://.godot/imported/TF_testSprites.aseprite-6a3b6e394dba11bf8c3e04d9e77c691d.res"
+
+[deps]
+
+source_file="res://assets/TF_testSprites.aseprite"
+dest_files=["res://.godot/imported/TF_testSprites.aseprite-6a3b6e394dba11bf8c3e04d9e77c691d.res"]
+
+[params]
+
