@@ -1,18 +1,46 @@
 [gd_scene format=3 uid="uid://v8l4x05oj6kr"]
 
 [ext_resource type="Script" uid="uid://bjj8t7170p6mj" path="res://actors/player/player.gd" id="1_nvxhs"]
-[ext_resource type="Texture2D" uid="uid://dhkr3aftu7k5w" path="res://actors/player/TF_testSprites.png" id="2_ilk7j"]
+[ext_resource type="Texture2D" uid="uid://dhkr3aftu7k5w" path="res://assets/TF_testSprites.png" id="2_ilk7j"]
+[ext_resource type="Script" uid="uid://bhxjxgka2uddu" path="res://systems/FSM/FSM.gd" id="3_ax26v"]
+[ext_resource type="Script" uid="uid://ct887i8qf7m0x" path="res://systems/FSM/PlayerFSM/state_idle.gd" id="4_lsqbn"]
+[ext_resource type="Script" uid="uid://bvtraurtcoxnl" path="res://systems/FSM/PlayerFSM/state_charge.gd" id="5_bop6h"]
+[ext_resource type="Script" uid="uid://dbideb32tg6h7" path="res://systems/FSM/PlayerFSM/state_jump.gd" id="6_a744p"]
+[ext_resource type="Script" uid="uid://cgqrx3p1y3uls" path="res://actors/player/fall.gd" id="7_388e2"]
+[ext_resource type="PackedScene" uid="uid://depdp5g8qy1y" path="res://systems/Trail Component/trail.tscn" id="8_388e2"]
+[ext_resource type="Script" uid="uid://d3ufmp26lqlq0" path="res://systems/Trail Component/trail.gd" id="9_lsln6"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ilk7j"]
 atlas = ExtResource("2_ilk7j")
 region = Rect2(0, 16, 32, 16)
 
-[node name="Player" type="CharacterBody2D" unique_id=1682234680]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lsqbn"]
+radius = 4.0
+height = 10.0
+
+[node name="Player" type="CharacterBody2D" unique_id=1682234680 groups=["player"]]
 script = ExtResource("1_nvxhs")
+SPEED = 80.0
+ACCELERATION = 5.0
+FRICTION = 3.0
+GRAVITY = 300.0
+JUMP_MAX_VELOCITY = -125.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1063401414]
+[node name="StateLabel" type="Label" parent="." unique_id=204877862]
+unique_name_in_owner = true
+offset_left = -20.0
+offset_top = -23.0
+offset_right = 20.0
+offset_bottom = -12.0
+theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1737909452]
+[node name="ScreenNotifier" type="VisibleOnScreenNotifier2D" parent="." unique_id=98084600]
+position = Vector2(-8, -40)
+rect = Rect2(0, 32, 16, 16)
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=1737909452]
+unique_name_in_owner = true
 texture = SubResource("AtlasTexture_ilk7j")
 hframes = 2
 metadata/_aseprite_wizard_interface_config_ = {
@@ -39,3 +67,32 @@ metadata/_aseprite_wizard_interface_config_ = {
 },
 "slice_section": false
 }
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1063401414]
+position = Vector2(0, 3)
+shape = SubResource("CapsuleShape2D_lsqbn")
+
+[node name="Trail" parent="." unique_id=1115313834 instance=ExtResource("8_388e2")]
+script = ExtResource("9_lsln6")
+
+[node name="FSM" type="Node" parent="." unique_id=519278212 node_paths=PackedStringArray("initial_state")]
+script = ExtResource("3_ax26v")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="FSM" unique_id=40521127 node_paths=PackedStringArray("PLAYER")]
+script = ExtResource("4_lsqbn")
+PLAYER = NodePath("../..")
+
+[node name="Charge" type="Node" parent="FSM" unique_id=815602772 node_paths=PackedStringArray("PLAYER")]
+script = ExtResource("5_bop6h")
+PLAYER = NodePath("../..")
+
+[node name="Jump" type="Node" parent="FSM" unique_id=756246032 node_paths=PackedStringArray("PLAYER")]
+script = ExtResource("6_a744p")
+PLAYER = NodePath("../..")
+
+[node name="Fall" type="Node" parent="FSM" unique_id=76098611 node_paths=PackedStringArray("PLAYER")]
+script = ExtResource("7_388e2")
+PLAYER = NodePath("../..")
+
+[connection signal="screen_exited" from="ScreenNotifier" to="." method="_on_screen_notifier_screen_exited"]
