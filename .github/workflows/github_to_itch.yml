@@ -32,7 +32,7 @@ jobs:
   
   - name: Download + Authorize Godot
     run: |
-       curl -L -o godot.zip https://downloads.tuxfamily.org/godotengine/4.6/Godot_v4.6-stable_linux.x86_64.zip
+       curl -L -o godot.zip https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_linux.x86_64.zip
        unzip godot.zip
        mv Godot_v4.6-stable_linux.x86_64 godot
        ls
@@ -40,7 +40,7 @@ jobs:
  
   - name: Download Export Templates
     run: |
-     curl -L -o export_templates.zip https://downloads.tuxfamily.org/godotengine/4.6/Godot_v4.6-stable_export_templates.tpz
+     curl -L -o export_templates.zip https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_export_templates.tpz
      unzip export_templates.zip
   
   - name: Install Export Templates
