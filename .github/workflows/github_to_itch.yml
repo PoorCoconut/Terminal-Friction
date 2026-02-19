@@ -8,6 +8,7 @@ on:
   branches:
   - main
 
+# Gives the bot permission to create your release tags
 permissions:
   contents: write
 
@@ -35,23 +36,28 @@ jobs:
   
   - name: Download + Authorize Godot
     run: |
-       curl -L -o godot.zip https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_linux.x86_64.zip
+       curl -L -o godot.zip https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_linux.x86_64.zip
        unzip godot.zip
-       mv Godot_v4.6-stable_linux.x86_64 godot
+       mv Godot_v4.6.1-stable_linux.x86_64 godot
        ls
        chmod +x godot
  
   - name: Download Export Templates
     run: |
-     curl -L -o export_templates.zip https://github.com/godotengine/godot/releases/download/4.6-stable/Godot_v4.6-stable_export_templates.tpz
+     curl -L -o export_templates.zip https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_export_templates.tpz
      unzip export_templates.zip
   
   - name: Install Export Templates
     run: |
-     mkdir -p ~/.local/share/godot/export_templates/4.6.stable
-     mv ./templates/* ~/.local/share/godot/export_templates/4.6.stable
+     mkdir -p ~/.local/share/godot/export_templates/4.6.1.stable
+     mv ./templates/* ~/.local/share/godot/export_templates/4.6.1.stable
   
-  # Updated to v4
+  # Tells Godot to build your Web HTML5 files
+  - name: Export Project
+    run: |
+      mkdir -p exports
+      ./godot --headless --export-release "Web" ./exports/index.html
+  
   - uses: actions/upload-artifact@v4
     with:
      name: exports
@@ -62,7 +68,6 @@ jobs:
   if: ${{ contains(github.ref, 'main') }}
   runs-on: ubuntu-latest
   steps:
-    # Updated to v4
     - uses: actions/checkout@v4
    
     - name: Version
@@ -75,7 +80,6 @@ jobs:
       if: ${{ !steps.tag_version.outputs.new_tag }}
       run: exit 1
     
-    # Updated to v4
     - name: Download Exports
       uses: actions/download-artifact@v4
       with:
@@ -111,7 +115,6 @@ jobs:
        content: ${{ steps.tag_version.outputs.new_version }}
        mode: 0655
     
-    # Updated to v4
     - uses: actions/upload-artifact@v4
       with:
        name: VERSION
@@ -122,8 +125,10 @@ jobs:
   if: ${{ contains(github.ref, 'main') }}
   runs-on: ubuntu-latest
   steps:
-    # Updated to v4
     - uses: actions/download-artifact@v4
+      with:
+       name: exports
+       path: exports
     
     - name: Download + Authorize Butler
       run: |
@@ -134,6 +139,11 @@ jobs:
     
     - name: Login To Butler
       run: ./butler login
+      
+    # Pushes the built HTML5 game directly to your itch.io page
+    - name: Push To Itch
+      run: |
+        ./butler push ./exports poorcoco/terminal-friction:html5
     
  Cleanup:
   needs: [Export, Release, Publish]
