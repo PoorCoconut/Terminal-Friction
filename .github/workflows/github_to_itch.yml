@@ -130,15 +130,13 @@ jobs:
        name: exports
        path: exports
     
+    # Downloads Butler using the correct .zone URL
     - name: Download + Authorize Butler
       run: |
-       curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
+       curl -L -o butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
        unzip butler.zip
        chmod +x butler
        ./butler -V
-    
-    - name: Login To Butler
-      run: ./butler login
       
     # Pushes the built HTML5 game directly to your itch.io page
     - name: Push To Itch
