@@ -8,6 +8,9 @@ on:
   branches:
   - main
 
+permissions:
+  contents: write
+
 env:
  BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }} 
  DISCORD_WEBHOOK: ${{secrets.DISCORD_WEBHOOK}} 
