@@ -7,20 +7,16 @@ on:
  pull_request:
   branches:
   - main
-
-# Gives the bot permission to create your release tags
-permissions:
-  contents: write
-
 env:
- BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }} 
- DISCORD_WEBHOOK: ${{secrets.DISCORD_WEBHOOK}} 
+ BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }} # Needs to be added through github
+ DISCORD_WEBHOOK: ${{secrets.DISCORD_WEBHOOK}} # Needs to be added through github
  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
  IS_MAIN: ${{ contains(github.ref, 'main') }}
  PROJECT_NAME: "Terminal Friction"
 
 jobs:
  CleanArtifacts:
+  # This job clears out the previous artifacts made so you don't run out of space in your github account
   runs-on: ubuntu-latest
   steps:
   - uses: kolpav/purge-artifacts-action@v1
@@ -29,36 +25,36 @@ jobs:
      expire-in: 1hr
 
  Export:
-  needs: CleanArtifacts
+  needs: CleanArtifacts # wait for artifacts to clean before making a new one
   runs-on: ubuntu-latest
   steps:
-  - uses: actions/checkout@v4
+  - uses: actions/checkout@v2
   
   - name: Download + Authorize Godot
     run: |
-       curl -L -o godot.zip https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_linux.x86_64.zip
+       curl -L -o godot.zip https://downloads.tuxfamily.org/godotengine/4.6/Godot_v4.6-stable_linux.x86_64.zip
        unzip godot.zip
-       mv Godot_v4.6.1-stable_linux.x86_64 godot
+       mv Godot_v4.6-stable_linux.x86_64 godot
        ls
        chmod +x godot
  
   - name: Download Export Templates
     run: |
-     curl -L -o export_templates.zip https://github.com/godotengine/godot/releases/download/4.6.1-stable/Godot_v4.6.1-stable_export_templates.tpz
+     curl -L -o export_templates.zip https://downloads.tuxfamily.org/godotengine/4.6/Godot_v4.6-stable_export_templates.tpz
      unzip export_templates.zip
   
   - name: Install Export Templates
     run: |
-     mkdir -p ~/.local/share/godot/export_templates/4.6.1.stable
-     mv ./templates/* ~/.local/share/godot/export_templates/4.6.1.stable
+     mkdir -p ~/.local/share/godot/export_templates/4.6.stable
+     mv ./templates/* ~/.local/share/godot/export_templates/4.6.stable
   
-  # Tells Godot to build your Web HTML5 files
-  - name: Export Project
+  - name: Export Web
     run: |
-      mkdir -p exports
-      ./godot --headless --export-release "Web" ./exports/index.html
-  
-  - uses: actions/upload-artifact@v4
+     mkdir -p ./
+     ./godot --headless --path ./ --export-release "Web" ./
+    
+
+  - uses: actions/upload-artifact@v2
     with:
      name: exports
      path: exports
@@ -68,7 +64,7 @@ jobs:
   if: ${{ contains(github.ref, 'main') }}
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v2
    
     - name: Version
       id: tag_version
@@ -81,7 +77,7 @@ jobs:
       run: exit 1
     
     - name: Download Exports
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v2
       with:
        name: exports
        path: exports
@@ -115,7 +111,7 @@ jobs:
        content: ${{ steps.tag_version.outputs.new_version }}
        mode: 0655
     
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v2
       with:
        name: VERSION
        path: ./VERSION.txt
@@ -125,28 +121,23 @@ jobs:
   if: ${{ contains(github.ref, 'main') }}
   runs-on: ubuntu-latest
   steps:
-    - uses: actions/download-artifact@v4
-      with:
-       name: exports
-       path: exports
+    - uses: actions/download-artifact@v2
     
-    # Downloads Butler using the correct .zone URL
     - name: Download + Authorize Butler
       run: |
-       curl -L -o butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+       curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
        unzip butler.zip
        chmod +x butler
        ./butler -V
-      
-    # Pushes the built HTML5 game directly to your itch.io page
-    - name: Push To Itch
-      run: |
-        ./butler push ./exports poorcoco/terminal-friction:html5
     
+    - name: Login To Butler
+      run: ./butler login
+    
+
  Cleanup:
   needs: [Export, Release, Publish]
   runs-on: ubuntu-latest
   steps:
-    - uses: geekyeggo/delete-artifact@v5
+    - uses: geekyeggo/delete-artifact@v1
       with:
        name: VERSION

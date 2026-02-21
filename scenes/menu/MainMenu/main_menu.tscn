@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://camlgx74mlna4"]
+
+[ext_resource type="Texture2D" uid="uid://c0vejukdcqovd" path="res://assets/menu/TF_Menu.png" id="1_i40pp"]
+
+[node name="MainMenu" type="Node2D" unique_id=930160177]
+
+[node name="TfMenu" type="Sprite2D" parent="." unique_id=1455350206]
+position = Vector2(192, 136)
+scale = Vector2(2, 2)
+texture = ExtResource("1_i40pp")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1493685966]
+anchor_mode = 0

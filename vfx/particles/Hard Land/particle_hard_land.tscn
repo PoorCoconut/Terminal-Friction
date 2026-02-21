@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://c8bkihfftkcqo"]
+
+[ext_resource type="Texture2D" uid="uid://ckpr2nsfuof6b" path="res://vfx/particles/TF_dust_fx.png" id="1_5rxvs"]
+[ext_resource type="Script" uid="uid://b7tyi1veil85e" path="res://vfx/particles/Hard Land/particle_hard_land.gd" id="2_brwff"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_brwff"]
+particles_animation = true
+particles_anim_h_frames = 8
+particles_anim_v_frames = 2
+particles_anim_loop = false
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_375x6"]
+atlas = ExtResource("1_5rxvs")
+region = Rect2(0, 0, 32, 8)
+
+[sub_resource type="Curve" id="Curve_qvyk6"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.2837838, 1), 0.0, 0.0, 0, 0, Vector2(0.7094595, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_s8q2t"]
+curve = SubResource("Curve_qvyk6")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_u7v0q"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(0, 5, 1)
+angle_min = -89.99999
+angle_max = 90.000015
+direction = Vector3(0, 0, 0)
+spread = 50.0
+initial_velocity_min = 5.0
+initial_velocity_max = 20.0
+linear_accel_min = -2.2351742e-06
+linear_accel_max = -2.2351742e-06
+radial_accel_min = -10.000002
+radial_accel_max = 9.999997
+damping_max = 20.0
+scale_curve = SubResource("CurveTexture_s8q2t")
+anim_offset_max = 1.0
+
+[node name="Particle_HardLand" type="GPUParticles2D" unique_id=1219074012]
+material = SubResource("CanvasItemMaterial_brwff")
+rotation = -1.5707964
+emitting = false
+amount = 50
+texture = SubResource("AtlasTexture_375x6")
+lifetime = 2.0
+one_shot = true
+explosiveness = 1.0
+randomness = 1.0
+process_material = SubResource("ParticleProcessMaterial_u7v0q")
+script = ExtResource("2_brwff")
+
+[connection signal="finished" from="." to="." method="_on_finished"]

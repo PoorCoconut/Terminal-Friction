@@ -12,8 +12,11 @@ func updateState(_delta : float):
 	
 	if Input.is_action_pressed("charge"):
 		transition.emit(self, "Charge")
-	
+	if !PLAYER.is_on_floor():
+		transition.emit(self, "Fall")
 	PLAYER.move_and_slide()
+	if Input.is_action_just_pressed("break"):
+		transition.emit(self, "Break")
 
 func determine_direction():
 	if Input.is_action_pressed("look_left"):

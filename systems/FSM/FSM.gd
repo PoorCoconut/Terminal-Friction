@@ -55,5 +55,6 @@ func force_change_state(new_state : String):
 
 func _process(delta: float) -> void:
 	%StateLabel.text = cur_state.name
+	GameManager.CURRENT_PLAYER_STATE = cur_state.name.to_lower()
 	if cur_state:
 		cur_state.updateState(delta);

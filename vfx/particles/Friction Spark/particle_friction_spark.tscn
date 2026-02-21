@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://cyjrrsk2rho5o"]
+
+[ext_resource type="Texture2D" uid="uid://ckpr2nsfuof6b" path="res://vfx/particles/TF_dust_fx.png" id="1_jxh8c"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0vojh"]
+atlas = ExtResource("1_jxh8c")
+region = Rect2(16, 8, 4, 4)
+
+[sub_resource type="Gradient" id="Gradient_jxh8c"]
+colors = PackedColorArray(1, 0, 0, 1, 1, 1, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_suei8"]
+gradient = SubResource("Gradient_jxh8c")
+
+[sub_resource type="Curve" id="Curve_0vojh"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.18243244, 1), 0.0, 0.0, 0, 0, Vector2(0.5270271, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="CurveTexture_1jil2"]
+curve = SubResource("Curve_0vojh")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_1jil2"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(3, 1, 1)
+angle_min = -89.99999
+angle_max = 90.000015
+angular_velocity_min = -10.000016
+angular_velocity_max = 9.999984
+linear_accel_min = -2.2351742e-06
+linear_accel_max = 99.99999
+damping_max = 2.0
+scale_curve = SubResource("CurveTexture_1jil2")
+color_ramp = SubResource("GradientTexture1D_suei8")
+
+[node name="Particle_FrictionSpark" type="GPUParticles2D" unique_id=469254737]
+amount = 100
+texture = SubResource("AtlasTexture_0vojh")
+lifetime = 0.5
+randomness = 1.0
+process_material = SubResource("ParticleProcessMaterial_1jil2")

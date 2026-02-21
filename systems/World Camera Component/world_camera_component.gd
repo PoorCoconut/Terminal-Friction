@@ -1,43 +1,53 @@
 extends Camera2D
+
 @export var target : CharacterBody2D
 @export var following : bool = true
 
 var cameraShakeNoise : FastNoiseLite
 
-# Called when the node enters the scene tree for the first time.
+# Cache these variables so we don't ask ProjectSettings every frame!
+var viewport_width : float
+var viewport_height : float
+
 func _ready() -> void:
-	if target:
-		following = true
-		global_position = target.global_position
+	viewport_width = ProjectSettings.get_setting("display/window/size/viewport_width")
+	viewport_height = ProjectSettings.get_setting("display/window/size/viewport_height")
 	
 	cameraShakeNoise = FastNoiseLite.new()
+	
+	if target:
+		following = true
+		# We use our new function to snap it to the right room immediately
+		moveCameraToEntity(target.global_position)
 
 func _process(_delta: float) -> void:
-	
-	
-	if following:
-		follow_target()
-
-func _physics_process(_delta: float) -> void:
-	#var mouse_pos = get_global_mouse_position()
-	#self.offset.x = (mouse_pos.x - global_position.x) / (160.0/2.0)
-	#self.offset.y = (mouse_pos.y - global_position.y) / (90.0/2.0)
-	pass
+	if following and target != null:
+		# NOTE: If you are making a room-based game (like Zelda/Metroid), 
+		# you should probably call moveCameraToEntity() here instead of follow_target()
+		moveCameraToEntity(target.global_position)
 
 func follow_target():
 	if target:
-		global_position = target.global_position
-
-func startCameraShake(intensity:float):
-	var cameraOffset = cameraShakeNoise.get_noise_1d(Time.get_ticks_msec()) * intensity
-	self.offset.x = cameraOffset
-	self.offset.y = cameraOffset
+		# Because the camera is Top-Left, we MUST subtract half the screen width/height
+		# to keep the player perfectly in the center of the screen.
+		global_position.x = target.global_position.x - (viewport_width / 2.0)
+		global_position.y = target.global_position.y - (viewport_height / 2.0)
 
 func moveCameraToEntity(entity_global_pos : Vector2):
-	var width = ProjectSettings.get_setting("display/window/size/viewport_width")
-	var height = ProjectSettings.get_setting("display/window/size/viewport_height")
+	# THE FIX: We use floor() instead of round(). 
+	# This ensures that anywhere from pixel 0 to 319 keeps you in Grid 0.
+	# The moment you hit pixel 320, floor() bumps you to Grid 1.
+	var grid_x = floor(entity_global_pos.x / viewport_width)
+	var grid_y = floor(entity_global_pos.y / viewport_height)
 	
-	var grid_x = round(entity_global_pos.x / width)
-	var grid_y = round(entity_global_pos.y / height)
-	global_position.x = grid_x * width
-	global_position.y = grid_y * height
+	global_position.x = grid_x * viewport_width
+	global_position.y = grid_y * viewport_height
+
+func startCameraShake(intensity:float):
+	var time = Time.get_ticks_msec()
+	offset.x = cameraShakeNoise.get_noise_1d(time) * intensity
+	offset.y = cameraShakeNoise.get_noise_1d(time + 10000) * intensity
+
+func resetCameraOffset():
+	offset.x = 0
+	offset.y = 0

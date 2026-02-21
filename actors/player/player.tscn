@@ -6,9 +6,21 @@
 [ext_resource type="Script" uid="uid://ct887i8qf7m0x" path="res://systems/FSM/PlayerFSM/state_idle.gd" id="4_lsqbn"]
 [ext_resource type="Script" uid="uid://bvtraurtcoxnl" path="res://systems/FSM/PlayerFSM/state_charge.gd" id="5_bop6h"]
 [ext_resource type="Script" uid="uid://dbideb32tg6h7" path="res://systems/FSM/PlayerFSM/state_jump.gd" id="6_a744p"]
-[ext_resource type="Script" uid="uid://cgqrx3p1y3uls" path="res://actors/player/fall.gd" id="7_388e2"]
+[ext_resource type="Script" uid="uid://cgqrx3p1y3uls" path="res://systems/FSM/PlayerFSM/fall.gd" id="7_388e2"]
 [ext_resource type="PackedScene" uid="uid://depdp5g8qy1y" path="res://systems/Trail Component/trail.tscn" id="8_388e2"]
 [ext_resource type="Script" uid="uid://d3ufmp26lqlq0" path="res://systems/Trail Component/trail.gd" id="9_lsln6"]
+[ext_resource type="Script" uid="uid://df0dnjqmkmvd0" path="res://systems/FSM/PlayerFSM/stun_fall.gd" id="10_lsln6"]
+[ext_resource type="PackedScene" uid="uid://c8bkihfftkcqo" path="res://vfx/particles/Hard Land/particle_hard_land.tscn" id="11_hiosj"]
+[ext_resource type="Script" uid="uid://pad7i606xawt" path="res://systems/FSM/PlayerFSM/state_break.gd" id="12_7aotg"]
+[ext_resource type="PackedScene" uid="uid://b8jfsmnnfeo14" path="res://vfx/particles/Dust/particle_dust.tscn" id="12_ssdk0"]
+[ext_resource type="PackedScene" uid="uid://cyjrrsk2rho5o" path="res://vfx/particles/Friction Spark/particle_friction_spark.tscn" id="14_k67x5"]
+[ext_resource type="PackedScene" uid="uid://cufm2ptvulil8" path="res://vfx/particles/Steam/particle_steam.tscn" id="15_12xki"]
+[ext_resource type="AudioStream" uid="uid://pgfyo6d02exg" path="res://sound/sfx/sfx_jump.mp3" id="16_0wchr"]
+[ext_resource type="AudioStream" uid="uid://cf74le6qfly5g" path="res://sound/sfx/sfx_hard_land.mp3" id="17_qrxv1"]
+[ext_resource type="AudioStream" uid="uid://c7lf448j46byb" path="res://sound/sfx/sfx_scrape.mp3" id="18_qrxv1"]
+[ext_resource type="AudioStream" uid="uid://bqe2fetf5ab2h" path="res://sound/sfx/sfx_steam_hiss_short.mp3" id="19_otn2r"]
+[ext_resource type="AudioStream" uid="uid://bd66ogckftf5n" path="res://sound/sfx/sfx_steam_hiss_long.mp3" id="20_ctwkf"]
+[ext_resource type="AudioStream" uid="uid://cs5b2tlgqkmh6" path="res://sound/sfx/sfx_gritty_bang.mp3" id="21_ctwkf"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ilk7j"]
 atlas = ExtResource("2_ilk7j")
@@ -19,25 +31,27 @@ radius = 4.0
 height = 10.0
 
 [node name="Player" type="CharacterBody2D" unique_id=1682234680 groups=["player"]]
+floor_constant_speed = true
+floor_snap_length = 8.0
 script = ExtResource("1_nvxhs")
 SPEED = 80.0
 ACCELERATION = 5.0
 FRICTION = 3.0
 GRAVITY = 300.0
 JUMP_MAX_VELOCITY = -125.0
+BOUNCE_FORCE_Y = -40.0
+STUN_FALL_SPEED = 150.0
+GAUGE_COOLDOWN_RATE = 4.0
 
 [node name="StateLabel" type="Label" parent="." unique_id=204877862]
 unique_name_in_owner = true
+visible = false
 offset_left = -20.0
 offset_top = -23.0
 offset_right = 20.0
 offset_bottom = -12.0
 theme_override_font_sizes/font_size = 8
 horizontal_alignment = 1
-
-[node name="ScreenNotifier" type="VisibleOnScreenNotifier2D" parent="." unique_id=98084600]
-position = Vector2(-8, -40)
-rect = Rect2(0, 32, 16, 16)
 
 [node name="Sprite" type="Sprite2D" parent="." unique_id=1737909452]
 unique_name_in_owner = true
@@ -95,4 +109,56 @@ PLAYER = NodePath("../..")
 script = ExtResource("7_388e2")
 PLAYER = NodePath("../..")
 
-[connection signal="screen_exited" from="ScreenNotifier" to="." method="_on_screen_notifier_screen_exited"]
+[node name="StunFall" type="Node" parent="FSM" unique_id=31139570 node_paths=PackedStringArray("PLAYER")]
+script = ExtResource("10_lsln6")
+PLAYER = NodePath("../..")
+LAND_PARTICLE_PATH = ExtResource("11_hiosj")
+
+[node name="Break" type="Node" parent="FSM" unique_id=1170059517 node_paths=PackedStringArray("PLAYER")]
+script = ExtResource("12_7aotg")
+PLAYER = NodePath("../..")
+
+[node name="Particle_Dust" parent="." unique_id=1219074012 instance=ExtResource("12_ssdk0")]
+unique_name_in_owner = true
+emitting = false
+
+[node name="Particle_FrictionSpark" parent="." unique_id=469254737 instance=ExtResource("14_k67x5")]
+unique_name_in_owner = true
+position = Vector2(0, 8)
+emitting = false
+
+[node name="Particle_Steam" parent="." unique_id=798248759 instance=ExtResource("15_12xki")]
+unique_name_in_owner = true
+position = Vector2(0, 8)
+emitting = false
+
+[node name="SFX Container" type="Node" parent="." unique_id=712052175]
+
+[node name="sfx_jump" type="AudioStreamPlayer" parent="SFX Container" unique_id=308819799]
+unique_name_in_owner = true
+stream = ExtResource("16_0wchr")
+bus = &"SFX"
+
+[node name="sfx_hardLand" type="AudioStreamPlayer" parent="SFX Container" unique_id=1707304887]
+unique_name_in_owner = true
+stream = ExtResource("17_qrxv1")
+bus = &"SFX"
+
+[node name="sfx_charge" type="AudioStreamPlayer" parent="SFX Container" unique_id=828237641]
+unique_name_in_owner = true
+stream = ExtResource("18_qrxv1")
+bus = &"SFX"
+
+[node name="sfx_steamShort" type="AudioStreamPlayer" parent="SFX Container" unique_id=199662278]
+unique_name_in_owner = true
+stream = ExtResource("19_otn2r")
+bus = &"SFX"
+
+[node name="sfx_steamLong" type="AudioStreamPlayer" parent="SFX Container" unique_id=394972962]
+unique_name_in_owner = true
+stream = ExtResource("20_ctwkf")
+bus = &"SFX"
+
+[node name="sfx_wallBump" type="AudioStreamPlayer" parent="SFX Container" unique_id=1744455791]
+unique_name_in_owner = true
+stream = ExtResource("21_ctwkf")
